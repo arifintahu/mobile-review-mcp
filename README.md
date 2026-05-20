@@ -168,7 +168,7 @@ npm run typecheck
 
 ## Changelog
 
-### 0.1.0 — Initial release
+### 1.0.0 — Initial stable release
 - 13 MCP tools for mobile QA via agent-browser
 - iOS and Android device emulation
 - JSON and Markdown report output
