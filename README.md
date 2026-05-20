@@ -54,6 +54,8 @@ git clone https://github.com/arifintahu/mobile-review-mcp.git
 cd mobile-review-mcp
 npm install        # installs agent-browser + downloads Chrome automatically
 npm run build
+
+# Run on the project scope, e.g. in the root of your project
 claude mcp add mobile-review-mcp -- node /absolute/path/to/dist/index.js
 ```
 
