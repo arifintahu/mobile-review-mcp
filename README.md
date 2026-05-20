@@ -1,22 +1,26 @@
 # mobile-review-mcp
 
-A Claude Code MCP server that gives Claude the tools to autonomously crawl your web app and review its mobile layout — finding overflow, broken tap targets, font issues, nav problems, and more.
+> A Claude Code MCP server that autonomously reviews your web app's mobile layout — crawling every page, taking screenshots, and generating a structured issue report.
 
-Built on [agent-browser](https://github.com/vercel-labs/agent-browser) by Vercel Labs for compact, token-efficient mobile snapshots.
+[![npm version](https://img.shields.io/npm/v/mobile-review-mcp)](https://www.npmjs.com/package/mobile-review-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org)
+
+Built on [agent-browser](https://github.com/vercel-labs/agent-browser) by Vercel Labs — returns compact accessibility-tree snapshots instead of raw HTML, keeping Claude's context efficient.
 
 ---
 
-## What it does
+## How it works
 
-Claude opens your site in an iOS or Android emulator, walks through every page it can find, takes screenshots, and files structured issues for anything that looks broken — then generates a JSON + Markdown report.
+Claude opens your site in an iOS or Android emulator, walks through every page it can find, takes screenshots, and files structured issues for anything that looks broken — then outputs a JSON + Markdown report.
 
-**Detected issue categories:** layout · overflow · text · tap-target · navigation · accessibility · performance · visual
+**Detected issue categories:** `layout` · `overflow` · `text` · `tap-target` · `navigation` · `accessibility` · `performance` · `visual`
 
 ---
 
 ## Prerequisites
 
-Install [agent-browser](https://github.com/vercel-labs/agent-browser):
+Install [agent-browser](https://github.com/vercel-labs/agent-browser) before using this MCP server:
 
 ```bash
 npm install -g agent-browser
@@ -31,7 +35,7 @@ agent-browser install   # downloads Chrome for Testing
 
 Search for **mobile-review-mcp** in the Claude Code extension marketplace and click Install.
 
-### Option B — via `claude mcp add` (npx, no global install)
+### Option B — via `claude mcp add` (recommended, no global install needed)
 
 ```bash
 claude mcp add mobile-review-mcp -- npx -y mobile-review-mcp
@@ -47,74 +51,79 @@ claude mcp add mobile-review-mcp -- mobile-review-mcp
 ### Option D — from source
 
 ```bash
-git clone https://github.com/arifintahu/mobile-review-mcp
+git clone https://github.com/arifintahu/mobile-review-mcp.git
 cd mobile-review-mcp
 npm install
 npm run build
-claude mcp add mobile-review-mcp -- node /path/to/mobile-review-mcp/dist/index.js
+claude mcp add mobile-review-mcp -- node /absolute/path/to/dist/index.js
 ```
 
-After adding, restart Claude Code or run `/mcp` to confirm it loaded.
-
----
-
-## Tools
-
-| Tool | Description |
-|---|---|
-| `mobile_check_dependencies` | Verify agent-browser is installed |
-| `mobile_open_url` | Open a URL in iOS/Android emulator |
-| `mobile_snapshot` | Get accessibility-tree snapshot of current page |
-| `mobile_click` | Click an element by ref ID (from snapshot) |
-| `mobile_type` | Type into a focusable element |
-| `mobile_scroll` | Scroll the page |
-| `mobile_back` | Navigate back |
-| `mobile_navigate` | Navigate to a new URL |
-| `mobile_get_url` | Get the current page URL |
-| `mobile_screenshot` | Take a screenshot (returns path + base64) |
-| `mobile_add_issue` | Record a found issue (severity + category) |
-| `mobile_generate_report` | Save JSON + Markdown report of all issues |
+After adding the server, restart Claude Code or run `/mcp` to confirm it loaded.
 
 ---
 
 ## Usage
 
-Once the MCP server is registered, paste a prompt like this into Claude Code:
+Once the MCP server is registered, paste this into Claude Code:
 
 ```
-Use the mobile review tools to QA the mobile view of https://yourapp.com.
+Use the mobile review tools to QA the mobile view of https://yourapp.com
 
-1. Check dependencies are ready.
+Steps:
+1. Check that agent-browser is installed and ready.
 2. Open the site with iOS iPhone 16 Pro emulation.
 3. Take a snapshot and screenshot on each page.
-4. Navigate all main sections via the menu.
-5. On each page, analyze the layout for:
+4. Navigate all main sections via the nav menu.
+5. On each page, check for:
    - Text overflow or clipping
    - Tap targets smaller than 44×44px
-   - Horizontal scroll caused by wide elements
+   - Horizontal scroll from oversized elements
    - Font sizes below 16px
    - Overlapping or hidden elements
-6. Record every issue with mobile_add_issue.
-7. Generate a final report with mobile_generate_report.
+6. Record each issue using mobile_add_issue.
+7. Generate the final report with mobile_generate_report.
 ```
 
-Reports are saved as:
-- `reports/mobile-review-<timestamp>.json`
-- `reports/mobile-review-<timestamp>.md`
+Reports are saved to:
+
+```
+reports/
+  mobile-review-<timestamp>.json
+  mobile-review-<timestamp>.md
+```
 
 See [`examples/review-prompt.md`](examples/review-prompt.md) for more prompt templates.
 
 ---
 
-## Issue severity guide
+## Tools reference
+
+| Tool | Description |
+|---|---|
+| `mobile_check_dependencies` | Verify agent-browser is installed |
+| `mobile_open_url` | Open a URL in iOS or Android emulator |
+| `mobile_snapshot` | Get the accessibility-tree snapshot of the current page |
+| `mobile_click` | Click an element by ref ID from the snapshot |
+| `mobile_type` | Type text into a focusable element |
+| `mobile_scroll` | Scroll the page |
+| `mobile_back` | Navigate back |
+| `mobile_navigate` | Navigate to a new URL |
+| `mobile_get_url` | Get the current page URL |
+| `mobile_screenshot` | Take a screenshot (returns path + base64) |
+| `mobile_add_issue` | Record a found issue with severity and category |
+| `mobile_generate_report` | Save JSON + Markdown report of all recorded issues |
+
+---
+
+## Severity guide
 
 | Severity | When to use |
 |---|---|
-| `critical` | Feature completely broken / unusable on mobile |
+| `critical` | Feature completely broken or unusable on mobile |
 | `high` | Major UX problem — users will struggle |
 | `medium` | Noticeable issue, workaround exists |
 | `low` | Minor polish issue |
-| `info` | Suggestion / observation |
+| `info` | Suggestion or observation |
 
 ---
 
@@ -122,35 +131,51 @@ See [`examples/review-prompt.md`](examples/review-prompt.md) for more prompt tem
 
 ```
 src/
-  index.ts           MCP server entry point
+  index.ts              MCP server entry point (stdio transport)
   tools/
-    open-url.ts      mobile_open_url
-    snapshot.ts      mobile_snapshot
-    interact.ts      mobile_click, mobile_type, mobile_scroll, ...
-    screenshot.ts    mobile_screenshot
-    review.ts        mobile_add_issue, mobile_generate_report
-    index.ts         Tool registry + dispatcher
+    open-url.ts         mobile_open_url
+    snapshot.ts         mobile_snapshot
+    interact.ts         mobile_click, mobile_type, mobile_scroll, mobile_back,
+                        mobile_navigate, mobile_get_url
+    screenshot.ts       mobile_screenshot
+    review.ts           mobile_add_issue, mobile_generate_report
+    index.ts            Tool registry and dispatcher
   utils/
-    browser.ts       agent-browser CLI wrapper
-    reporter.ts      Report builder + Markdown renderer
+    browser.ts          agent-browser CLI wrapper
+    reporter.ts         Report builder and Markdown renderer
 examples/
-  review-prompt.md   Prompt templates
+  review-prompt.md      Ready-to-use prompt templates
 ```
 
 ---
 
 ## Contributing
 
-PRs welcome. Please open an issue first for significant changes.
+Issues and PRs are welcome. Please open an issue before starting significant work so we can discuss the approach.
 
 ```bash
-npm run dev       # run with tsx (no build needed)
-npm run build     # compile TypeScript
-npm run typecheck # type check only
+# Run without building
+npm run dev
+
+# Build TypeScript
+npm run build
+
+# Type check only
+npm run typecheck
 ```
+
+---
+
+## Changelog
+
+### 0.1.0 — Initial release
+- 13 MCP tools for mobile QA via agent-browser
+- iOS and Android device emulation
+- JSON and Markdown report output
+- Severity and category classification for issues
 
 ---
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE) for details.

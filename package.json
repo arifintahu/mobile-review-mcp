@@ -1,6 +1,6 @@
 {
   "name": "mobile-review-mcp",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Claude Code MCP server for mobile view QA — crawl and review your web app across all pages on iOS/Android emulators",
   "type": "module",
   "main": "dist/index.js",
