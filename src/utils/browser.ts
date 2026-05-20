@@ -2,6 +2,12 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
+const EXEC_TIMEOUT = 60_000;
+const OPEN_TIMEOUT = 120_000;
+
+function toShellPath(p: string): string {
+  return p.replace(/\\/g, '/');
+}
 
 export type Platform = 'ios' | 'android' | 'desktop';
 
@@ -37,48 +43,48 @@ export class AgentBrowser {
   }
 
   async open(url: string): Promise<ExecResult> {
-    return execAsync(`agent-browser ${this.platformFlags()} open "${url}"`);
+    return execAsync(`agent-browser ${this.platformFlags()} open "${url}"`, { timeout: OPEN_TIMEOUT });
   }
 
   async snapshot(interactive = false): Promise<ExecResult> {
     const flag = interactive ? '-i' : '';
-    return execAsync(`agent-browser snapshot ${flag}`.trim());
+    return execAsync(`agent-browser snapshot ${flag}`.trim(), { timeout: EXEC_TIMEOUT });
   }
 
   async click(ref: string): Promise<ExecResult> {
-    return execAsync(`agent-browser click ${ref}`);
+    return execAsync(`agent-browser click ${ref}`, { timeout: EXEC_TIMEOUT });
   }
 
   async type(ref: string, text: string): Promise<ExecResult> {
     const escaped = text.replace(/"/g, '\\"');
-    return execAsync(`agent-browser type ${ref} "${escaped}"`);
+    return execAsync(`agent-browser type ${ref} "${escaped}"`, { timeout: EXEC_TIMEOUT });
   }
 
   async screenshot(outputPath?: string): Promise<ExecResult> {
-    const pathArg = outputPath ? `--output "${outputPath}"` : '';
-    return execAsync(`agent-browser screenshot ${pathArg}`.trim());
+    const pathArg = outputPath ? `"${toShellPath(outputPath)}"` : '';
+    return execAsync(`agent-browser screenshot ${pathArg}`.trim(), { timeout: EXEC_TIMEOUT });
   }
 
   async navigate(url: string): Promise<ExecResult> {
-    return execAsync(`agent-browser navigate "${url}"`);
+    return execAsync(`agent-browser navigate "${url}"`, { timeout: EXEC_TIMEOUT });
   }
 
   async back(): Promise<ExecResult> {
-    return execAsync('agent-browser back');
+    return execAsync('agent-browser back', { timeout: EXEC_TIMEOUT });
   }
 
   async getUrl(): Promise<string> {
-    const { stdout } = await execAsync('agent-browser url');
+    const { stdout } = await execAsync('agent-browser url', { timeout: EXEC_TIMEOUT });
     return stdout.trim();
   }
 
   async scroll(direction: 'up' | 'down' | 'left' | 'right', amount = 300): Promise<ExecResult> {
-    return execAsync(`agent-browser scroll ${direction} ${amount}`);
+    return execAsync(`agent-browser scroll ${direction} ${amount}`, { timeout: EXEC_TIMEOUT });
   }
 
   static async checkInstalled(): Promise<boolean> {
     try {
-      await execAsync('agent-browser --version');
+      await execAsync('agent-browser --version', { timeout: 5_000 });
       return true;
     } catch {
       return false;
