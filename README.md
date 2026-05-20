@@ -166,6 +166,9 @@ npm run typecheck
 
 ## Changelog
 
+### 1.0.1
+- Remove local config files from npm tarball via `.npmignore`
+
 ### 1.0.0 — Initial stable release
 - 13 MCP tools for mobile QA via agent-browser
 - iOS and Android device emulation

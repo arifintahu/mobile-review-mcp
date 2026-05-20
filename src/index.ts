@@ -10,7 +10,7 @@ import { tools, handleToolCall } from './tools/index.js';
 const server = new Server(
   {
     name: 'mobile-review-mcp',
-    version: '1.0.0',
+    version: '1.0.1',
   },
   {
     capabilities: {
