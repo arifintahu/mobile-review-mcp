@@ -1,0 +1,13 @@
+.claude/
+.github/
+src/
+tsconfig.json
+examples/
+*.js.map
+*.d.ts.map
+.env
+.DS_Store
+reports/
+screenshots/
+*.png
+*.jpg
