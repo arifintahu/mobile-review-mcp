@@ -2,6 +2,7 @@
 
 > A Claude Code MCP server that autonomously reviews your web app's mobile layout — crawling every page, taking screenshots, and generating a structured issue report.
 
+[![Build](https://github.com/arifintahu/mobile-review-mcp/actions/workflows/build.yml/badge.svg)](https://github.com/arifintahu/mobile-review-mcp/actions/workflows/build.yml)
 [![npm version](https://img.shields.io/npm/v/mobile-review-mcp)](https://www.npmjs.com/package/mobile-review-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org)
