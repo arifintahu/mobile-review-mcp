@@ -25,11 +25,7 @@ All options below install [agent-browser](https://github.com/vercel-labs/agent-b
 
 > **Requirements:** Node.js ≥ 18
 
-### Option A — Claude Code marketplace
-
-Search for **mobile-review-mcp** in the Claude Code extension marketplace and click **Install**. Agent-browser and Chrome for Testing are set up automatically.
-
-### Option B — via `claude mcp add` _(recommended)_
+### Option A — via `claude mcp add` _(recommended)_
 
 No global install needed — npx handles everything in one command:
 
@@ -39,7 +35,7 @@ claude mcp add mobile-review-mcp -- npx -y mobile-review-mcp
 
 > On first run, npx installs the package, which triggers `agent-browser install` to download Chrome for Testing automatically.
 
-### Option C — global npm install
+### Option B — global npm install
 
 ```bash
 npm install -g mobile-review-mcp
@@ -48,7 +44,7 @@ claude mcp add mobile-review-mcp -- mobile-review-mcp
 
 > `postinstall` downloads Chrome for Testing automatically during `npm install`.
 
-### Option D — from source
+### Option C — from source
 
 ```bash
 git clone https://github.com/arifintahu/mobile-review-mcp.git
