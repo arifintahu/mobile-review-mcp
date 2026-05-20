@@ -36,14 +36,12 @@ export class AgentBrowser {
     this.device = options.device ?? DEFAULT_DEVICE[this.platform];
   }
 
-  private platformFlags(): string {
-    if (this.platform === 'desktop') return '';
-    const deviceFlag = this.device ? `--device "${this.device}"` : '';
-    return `-p ${this.platform} ${deviceFlag}`.trim();
-  }
-
   async open(url: string): Promise<ExecResult> {
-    return execAsync(`agent-browser ${this.platformFlags()} open "${url}"`, { timeout: OPEN_TIMEOUT });
+    const result = await execAsync(`agent-browser open "${url}"`, { timeout: OPEN_TIMEOUT });
+    if (this.platform !== 'desktop' && this.device) {
+      await execAsync(`agent-browser set device "${this.device}"`, { timeout: EXEC_TIMEOUT });
+    }
+    return result;
   }
 
   async snapshot(interactive = false): Promise<ExecResult> {
